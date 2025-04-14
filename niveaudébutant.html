@@ -12,18 +12,19 @@
       padding: 0;
       text-align: center;
     }
-
     h1 {
       margin: 20px;
       color: #2e7d32;
     }
-
     #progression {
-      margin: 10px;
       font-weight: bold;
+      margin: 10px;
       color: #1b5e20;
     }
-
+    #timer, #lives {
+      font-weight: bold;
+      margin: 10px;
+    }
     .question {
       margin: 20px auto;
       background: #ffffff;
@@ -33,7 +34,6 @@
       width: 90%;
       max-width: 600px;
     }
-
     .choices button {
       display: block;
       margin: 10px auto;
@@ -45,11 +45,9 @@
       cursor: pointer;
       transition: background 0.3s;
     }
-
     .choices button:hover {
       background: #388e3c;
     }
-
     #resultat-final {
       display: none;
       padding: 30px;
@@ -59,10 +57,13 @@
 <body>
   <h1>⚽ Quiz - Niveau Débutant</h1>
   <div id="progression">Question 1 / 10</div>
+  <div id="timer">⏱️ Temps : <span id="time">10</span>s</div>
+  <div id="lives">❤️ Vies restantes : <span id="life">5</span></div>
 
   <div id="quiz-container" class="question">
     <div id="question-text"></div>
     <div class="choices" id="choices"></div>
+    <div id="feedback"></div>
   </div>
 
   <div id="resultat-final">
@@ -77,41 +78,77 @@
       { question: "Quel est le surnom de l'équipe nationale du Brésil ?", choices: ["La Roja", "La Canarinha", "Les Bleus", "Les Lions"], answer: "La Canarinha" },
       { question: "Quel joueur a marqué le but vainqueur lors de la finale 2010 ?", choices: ["Iniesta", "Messi", "Ronaldo", "Xavi"], answer: "Iniesta" },
       { question: "Combien de minutes dure un match (temps réglementaire) ?", choices: ["80", "90", "100", "70"], answer: "90" },
-      { question: "Quel est le pays hôte de la Coupe du Monde 2022 ?", choices: ["Qatar", "USA", "Espagne", "Angleterre"], answer: "Qatar" },
-      { question: "Quel joueur a remporté le Ballon d'Or en 2019 ?", choices: ["Messi", "Modric", "Benzema", "Ronaldo"], answer: "Messi" },
-      { question: "Quel club a remporté la Ligue des Champions en 2019 ?", choices: ["Liverpool", "Tottenham", "Chelsea", "Real Madrid"], answer: "Liverpool" },
-      { question: "Quel est le nombre minimum de joueurs pour démarrer un match ?", choices: ["11", "10", "9", "7"], answer: "7" },
-      { question: "Quel joueur détient le record de buts en Coupe du Monde ?", choices: ["Miroslav Klose", "Pelé", "Ronaldo", "Messi"], answer: "Miroslav Klose" }
+      { question: "Quel pays organise la Coupe du Monde 2022 ?", choices: ["Qatar", "Russie", "USA", "France"], answer: "Qatar" },
+      { question: "Qui a gagné la Coupe du Monde 1998 ?", choices: ["Brésil", "Allemagne", "France", "Italie"], answer: "France" },
+      { question: "Combien de Coupes du Monde possède le Brésil ?", choices: ["3", "4", "5", "6"], answer: "5" },
+      { question: "Quel est le nom du ballon officiel de la Coupe du Monde 2014 ?", choices: ["Brazuca", "Jabulani", "Telstar", "Fevernova"], answer: "Brazuca" },
+      { question: "Quel joueur français a marqué un triplé en finale de Coupe du Monde ?", choices: ["Mbappé", "Griezmann", "Zidane", "Henry"], answer: "Mbappé" }
     ];
 
     let currentQuestion = 0;
     let score = 0;
+    let lives = 5;
+    let timer;
+    let timeLeft = 10;
+
+    function updateProgression() {
+      document.getElementById("progression").textContent = `Question ${currentQuestion + 1} / ${questions.length}`;
+    }
+
+    function startTimer() {
+      timeLeft = 10;
+      document.getElementById("time").textContent = timeLeft;
+      timer = setInterval(() => {
+        timeLeft--;
+        document.getElementById("time").textContent = timeLeft;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          handleAnswer(null);
+        }
+      }, 1000);
+    }
 
     function showQuestion() {
+      clearInterval(timer);
+      updateProgression();
       const q = questions[currentQuestion];
       document.getElementById("question-text").textContent = q.question;
-      document.getElementById("progression").textContent = `Question ${currentQuestion + 1} / ${questions.length}`;
       const choicesDiv = document.getElementById("choices");
+      const feedback = document.getElementById("feedback");
       choicesDiv.innerHTML = "";
+      feedback.textContent = "";
       q.choices.forEach(choice => {
         const btn = document.createElement("button");
         btn.textContent = choice;
         btn.onclick = () => handleAnswer(choice);
         choicesDiv.appendChild(btn);
       });
+      startTimer();
     }
 
     function handleAnswer(choice) {
-      const isCorrect = choice === questions[currentQuestion].answer;
-      if (isCorrect) score++;
-      currentQuestion++;
+      clearInterval(timer);
+      const feedback = document.getElementById("feedback");
+      const correctAnswer = questions[currentQuestion].answer;
+      if (choice === correctAnswer) {
+        feedback.textContent = "✅ Bonne réponse !";
+        score++;
+      } else {
+        feedback.textContent = `❌ Mauvaise réponse ! La bonne réponse était : ${correctAnswer}`;
+        lives--;
+        document.getElementById("life").textContent = lives;
+        if (lives <= 0) {
+          return finishQuiz();
+        }
+      }
       setTimeout(() => {
+        currentQuestion++;
         if (currentQuestion < questions.length) {
           showQuestion();
         } else {
           finishQuiz();
         }
-      }, 500); // délai entre les questions (0.5 seconde)
+      }, 1500);
     }
 
     function finishQuiz() {
@@ -136,5 +173,6 @@
   </script>
 </body>
 </html>
+
 
 
