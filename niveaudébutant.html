@@ -7,55 +7,221 @@
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
+      background: #e8f5e9;
       margin: 0;
       padding: 0;
-      background: #e8f5e9;
       text-align: center;
     }
 
     h1 {
-      margin-top: 30px;
-      color: #2c3e50;
+      margin: 20px;
+      color: #2e7d32;
     }
 
-    /* Ajoute ton style ici */
+    .question {
+      margin: 20px auto;
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 600px;
+    }
+
+    .choices button, .drop-zone, .vf-zone button {
+      display: block;
+      margin: 10px auto;
+      padding: 10px 20px;
+      background: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .choices button:hover, .vf-zone button:hover {
+      background: #388e3c;
+    }
+
+    .drop-zone {
+      border: 2px dashed #4caf50;
+      background: #c8e6c9;
+      padding: 20px;
+      min-height: 40px;
+    }
+
+    .draggable {
+      background: #81c784;
+      padding: 5px 10px;
+      margin: 5px;
+      cursor: move;
+      display: inline-block;
+      border-radius: 5px;
+    }
+
+    .vf-zone {
+      display: flex;
+      justify-content: space-around;
+    }
+
+    #resultat-final {
+      display: none;
+      padding: 30px;
+    }
   </style>
 </head>
 <body>
   <h1>⚽ Quiz - Niveau Débutant</h1>
 
-  <div id="quiz-container">
-    <!-- Questions ici -->
+  <div id="quiz-container" class="question">
+    <div id="question-text"></div>
+    <div id="question-extra"></div>
+    <div class="choices" id="choices"></div>
   </div>
 
-  <div id="resultat-final" style="display:none;">
+  <div id="resultat-final">
     <h2>🎉 Félicitations !</h2>
-    <p>Tu as terminé le niveau débutant.</p>
     <p id="score-final"></p>
   </div>
 
   <script>
-    // Ton quiz ici...
+    const questions = [
+      {
+        type: "qcm",
+        question: "Quelle nation a remporté la Coupe du Monde 2018 ?",
+        choices: ["Brésil", "France", "Croatie", "Allemagne"],
+        answer: "France"
+      },
+      {
+        type: "vf",
+        question: "Le football se joue avec une balle carrée.",
+        answer: "faux"
+      },
+      {
+        type: "glisser",
+        question: "Glisse le bon mot dans la zone : Champion du monde 1998",
+        draggable: ["France", "Italie", "Allemagne"],
+        answer: "France"
+      },
+      {
+        type: "classement",
+        question: "Classe ces pays par nombre de Coupes du Monde remportées (du + au -)",
+        items: ["Brésil", "Allemagne", "France"],
+        answer: ["Brésil", "Allemagne", "France"]
+      }
+    ];
 
-    // Exemple de fonction pour terminer le quiz
-    function afficherResultat(score, total) {
-      document.getElementById("quiz-container").style.display = "none";
-      document.getElementById("resultat-final").style.display = "block";
-      document.getElementById("score-final").textContent = `Score : ${score} / ${total}`;
+    let currentQuestion = 0;
+    let score = 0;
 
-      // Marquer le niveau comme complété
-      enregistrerActivite("Niveau Débutant");
+    function showQuestion() {
+      const q = questions[currentQuestion];
+      document.getElementById("question-text").textContent = q.question;
+      const choicesDiv = document.getElementById("choices");
+      const extraDiv = document.getElementById("question-extra");
+      choicesDiv.innerHTML = "";
+      extraDiv.innerHTML = "";
+
+      if (q.type === "qcm") {
+        q.choices.forEach(choice => {
+          const btn = document.createElement("button");
+          btn.textContent = choice;
+          btn.onclick = () => checkAnswer(choice);
+          choicesDiv.appendChild(btn);
+        });
+      } else if (q.type === "vf") {
+        const vfZone = document.createElement("div");
+        vfZone.className = "vf-zone";
+        ["vrai", "faux"].forEach(rep => {
+          const btn = document.createElement("button");
+          btn.textContent = rep;
+          btn.onclick = () => checkAnswer(rep);
+          vfZone.appendChild(btn);
+        });
+        extraDiv.appendChild(vfZone);
+      } else if (q.type === "glisser") {
+        q.draggable.forEach(item => {
+          const drag = document.createElement("div");
+          drag.className = "draggable";
+          drag.draggable = true;
+          drag.textContent = item;
+          drag.ondragstart = e => e.dataTransfer.setData("text/plain", item);
+          extraDiv.appendChild(drag);
+        });
+        const dropZone = document.createElement("div");
+        dropZone.className = "drop-zone";
+        dropZone.ondragover = e => e.preventDefault();
+        dropZone.ondrop = e => {
+          e.preventDefault();
+          const data = e.dataTransfer.getData("text/plain");
+          checkAnswer(data);
+        };
+        choicesDiv.appendChild(dropZone);
+      } else if (q.type === "classement") {
+        const sortedItems = [...q.items];
+        sortedItems.forEach(item => {
+          const drag = document.createElement("div");
+          drag.className = "draggable";
+          drag.draggable = true;
+          drag.textContent = item;
+          drag.ondragstart = e => e.dataTransfer.setData("text/plain", item);
+          extraDiv.appendChild(drag);
+        });
+
+        const dropZone = document.createElement("div");
+        dropZone.className = "drop-zone";
+        dropZone.textContent = "Place les éléments ici dans le bon ordre.";
+        dropZone.ondragover = e => e.preventDefault();
+        let classement = [];
+        dropZone.ondrop = e => {
+          e.preventDefault();
+          const data = e.dataTransfer.getData("text/plain");
+          classement.push(data);
+          dropZone.textContent = classement.join(" > ");
+          if (classement.length === q.answer.length) {
+            checkAnswer(classement);
+          }
+        };
+        choicesDiv.appendChild(dropZone);
+      }
     }
 
-    // Ajoute cette fonction :
+    function checkAnswer(choice) {
+      const q = questions[currentQuestion];
+      if (Array.isArray(choice)) {
+        if (JSON.stringify(choice) === JSON.stringify(q.answer)) score++;
+      } else {
+        if (choice.toLowerCase() === q.answer.toLowerCase()) score++;
+      }
+      currentQuestion++;
+      if (currentQuestion < questions.length) {
+        showQuestion();
+      } else {
+        finishQuiz();
+      }
+    }
+
+    function finishQuiz() {
+      document.getElementById("quiz-container").style.display = "none";
+      document.getElementById("resultat-final").style.display = "block";
+      document.getElementById("score-final").textContent = `Tu as obtenu ${score} / ${questions.length}`;
+      enregistrerActivite("Niveau Débutant");
+      let totalXP = parseInt(localStorage.getItem("totalXP")) || 0;
+      totalXP += score;
+      localStorage.setItem("totalXP", totalXP);
+    }
+
     function enregistrerActivite(nomActivite) {
       let activities = JSON.parse(localStorage.getItem("activities")) || [];
-
       if (!activities.includes(nomActivite)) {
         activities.push(nomActivite);
         localStorage.setItem("activities", JSON.stringify(activities));
       }
     }
+
+    showQuestion();
   </script>
 </body>
 </html>
+
