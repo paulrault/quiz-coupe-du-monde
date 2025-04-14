@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Foot - Niveau Intermédiaire</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #fff3e0;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    h1 {
+      margin: 20px;
+      color: #ef6c00;
+    }
+    .question {
+      margin: 20px auto;
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 600px;
+    }
+    .choices button {
+      display: block;
+      margin: 10px auto;
+      padding: 10px 20px;
+      background: #ff9800;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .choices button:hover {
+      background: #fb8c00;
+    }
+    #resultat-final {
+      display: none;
+      padding: 30px;
+    }
+  </style>
+</head>
+<body>
+  <h1>⚽ Quiz - Niveau Intermédiaire</h1>
+
+  <div id="quiz-container" class="question">
+    <div id="question-text"></div>
+    <div class="choices" id="choices"></div>
+  </div>
+
+  <div id="resultat-final">
+    <h2>🎉 Bien joué !</h2>
+    <p id="score-final"></p>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        question: "Quel club a remporté la Ligue des Champions en 2020 ?",
+        choices: ["Manchester City", "PSG", "Bayern Munich", "Real Madrid"],
+        answer: "Bayern Munich"
+      },
+      {
+        question: "Quel joueur est connu pour sa célébration 'Siuuu' ?",
+        choices: ["Messi", "Ronaldo", "Mbappé", "Haaland"],
+        answer: "Ronaldo"
+      },
+      {
+        question: "Combien de Coupes du Monde le Brésil a-t-il remportées ?",
+        choices: ["3", "4", "5", "6"],
+        answer: "5"
+      },
+      {
+        question: "Quel pays a accueilli la Coupe du Monde 2014 ?",
+        choices: ["Afrique du Sud", "Brésil", "Allemagne", "Russie"],
+        answer: "Brésil"
+      },
+      {
+        question: "Qui a remporté le Ballon d'Or en 2021 ?",
+        choices: ["Cristiano Ronaldo", "Karim Benzema", "Lionel Messi", "Lewandowski"],
+        answer: "Lionel Messi"
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+
+    function showQuestion() {
+      const q = questions[currentQuestion];
+      document.getElementById("question-text").textContent = q.question;
+      const choicesDiv = document.getElementById("choices");
+      choicesDiv.innerHTML = "";
+      q.choices.forEach(choice => {
+        const btn = document.createElement("button");
+        btn.textContent = choice;
+        btn.onclick = () => checkAnswer(choice);
+        choicesDiv.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(choice) {
+      if (choice === questions[currentQuestion].answer) {
+        score++;
+      }
+      currentQuestion++;
+      if (currentQuestion < questions.length) {
+        showQuestion();
+      } else {
+        finishQuiz();
+      }
+    }
+
+    function finishQuiz() {
+      document.getElementById("quiz-container").style.display = "none";
+      document.getElementById("resultat-final").style.display = "block";
+      document.getElementById("score-final").textContent = `Tu as obtenu ${score} / ${questions.length}`;
+      enregistrerActivite("Niveau Intermédiaire");
+
+      let totalXP = parseInt(localStorage.getItem("totalXP")) || 0;
+      totalXP += score;
+      localStorage.setItem("totalXP", totalXP);
+    }
+
+    function enregistrerActivite(nomActivite) {
+      let activities = JSON.parse(localStorage.getItem("activities")) || [];
+      if (!activities.includes(nomActivite)) {
+        activities.push(nomActivite);
+        localStorage.setItem("activities", JSON.stringify(activities));
+      }
+    }
+
+    showQuestion();
+  </script>
+</body>
+</html>
