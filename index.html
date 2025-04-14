@@ -4,9 +4,7 @@
   <meta charset="UTF-8">
   <title>Quiz Coupe du Monde</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
       font-family: 'Segoe UI', sans-serif;
       background: #f4f4f4;
@@ -68,6 +66,26 @@
       text-align: right;
       color: #e74c3c;
     }
+    #progress-container {
+      width: 100%;
+      height: 10px;
+      background: #ddd;
+      border-radius: 5px;
+      margin: 10px 0;
+      overflow: hidden;
+    }
+    #progress-bar {
+      height: 100%;
+      width: 0%;
+      background: #2ecc71;
+      transition: width 0.4s ease;
+    }
+    #question-counter {
+      font-size: 1em;
+      text-align: left;
+      margin-bottom: 10px;
+      color: #666;
+    }
   </style>
 </head>
 <body>
@@ -87,6 +105,8 @@
 
   <div class="container hidden" id="quizBox">
     <div id="timer">Temps restant : <span id="time">15</span>s</div>
+    <div id="progress-container"><div id="progress-bar"></div></div>
+    <div id="question-counter"></div>
     <div class="question" id="question"></div>
     <ul class="choices" id="choices"></ul>
     <button id="nextBtn">Suivant</button>
@@ -94,6 +114,7 @@
 
   <div class="container hidden" id="result">
     <h2 id="scoreText">Score final : </h2>
+    <div id="starRating" style="text-align: center; font-size: 1.5em; margin-top: 10px;"></div>
     <p id="message"></p>
     <p id="previousScore"></p>
     <button onclick="location.reload()">Rejouer</button>
@@ -101,56 +122,16 @@
 
   <script>
     const questions = [
-      {
-        question: "Quel pays a remporté la Coupe du Monde 2018 ?",
-        choices: ["Allemagne", "France", "Brésil", "Argentine"],
-        answer: "France"
-      },
-      {
-        question: "Combien de joueurs composent une équipe sur le terrain ?",
-        choices: ["9", "10", "11", "12"],
-        answer: "11"
-      },
-      {
-        question: "Quel joueur a marqué un triplé en finale de la Coupe du Monde 2022 ?",
-        choices: ["Lionel Messi", "Neymar", "Kylian Mbappé", "Cristiano Ronaldo"],
-        answer: "Kylian Mbappé"
-      },
-      {
-        question: "Quel pays a organisé la première Coupe du Monde en 1930 ?",
-        choices: ["Italie", "Uruguay", "Brésil", "Allemagne"],
-        answer: "Uruguay"
-      },
-      {
-        question: "Combien de Coupes du Monde a remportées le Brésil ?",
-        choices: ["3", "4", "5", "6"],
-        answer: "5"
-      },
-      {
-        question: "Quel pays a gagné la Coupe du Monde 2014 ?",
-        choices: ["Argentine", "Allemagne", "Espagne", "Pays-Bas"],
-        answer: "Allemagne"
-      },
-      {
-        question: "Qui est surnommé 'la Pulga' ?",
-        choices: ["Neymar", "Cristiano Ronaldo", "Lionel Messi", "Pelé"],
-        answer: "Lionel Messi"
-      },
-      {
-        question: "Dans quel pays s’est déroulée la Coupe du Monde 2022 ?",
-        choices: ["Russie", "Qatar", "États-Unis", "Espagne"],
-        answer: "Qatar"
-      },
-      {
-        question: "Quel trophée remporte le vainqueur de la Coupe du Monde ?",
-        choices: ["Ligue des Champions", "Ballon d’Or", "Trophée Jules Rimet", "Trophée UEFA"],
-        answer: "Trophée Jules Rimet"
-      },
-      {
-        question: "Combien de temps dure un match de football (hors prolongation) ?",
-        choices: ["80 minutes", "90 minutes", "100 minutes", "60 minutes"],
-        answer: "90 minutes"
-      }
+      { question: "Quel pays a remporté la Coupe du Monde 2018 ?", choices: ["Allemagne", "France", "Brésil", "Argentine"], answer: "France" },
+      { question: "Combien de joueurs composent une équipe sur le terrain ?", choices: ["9", "10", "11", "12"], answer: "11" },
+      { question: "Quel joueur a marqué un triplé en finale de la Coupe du Monde 2022 ?", choices: ["Lionel Messi", "Neymar", "Kylian Mbappé", "Cristiano Ronaldo"], answer: "Kylian Mbappé" },
+      { question: "Quel pays a organisé la première Coupe du Monde en 1930 ?", choices: ["Italie", "Uruguay", "Brésil", "Allemagne"], answer: "Uruguay" },
+      { question: "Combien de Coupes du Monde a remportées le Brésil ?", choices: ["3", "4", "5", "6"], answer: "5" },
+      { question: "Quel pays a gagné la Coupe du Monde 2014 ?", choices: ["Argentine", "Allemagne", "Espagne", "Pays-Bas"], answer: "Allemagne" },
+      { question: "Qui est surnommé 'la Pulga' ?", choices: ["Neymar", "Cristiano Ronaldo", "Lionel Messi", "Pelé"], answer: "Lionel Messi" },
+      { question: "Dans quel pays s’est déroulée la Coupe du Monde 2022 ?", choices: ["Russie", "Qatar", "États-Unis", "Espagne"], answer: "Qatar" },
+      { question: "Quel trophée remporte le vainqueur de la Coupe du Monde ?", choices: ["Ligue des Champions", "Ballon d’Or", "Trophée Jules Rimet", "Trophée UEFA"], answer: "Trophée Jules Rimet" },
+      { question: "Combien de temps dure un match de football (hors prolongation) ?", choices: ["80 minutes", "90 minutes", "100 minutes", "60 minutes"], answer: "90 minutes" }
     ];
 
     let currentQuestion = 0;
@@ -168,6 +149,7 @@
     const message = document.getElementById('message');
     const previousScore = document.getElementById('previousScore');
     const timeDisplay = document.getElementById('time');
+    const questionCounter = document.getElementById('question-counter');
 
     function startQuiz() {
       intro.classList.add('hidden');
@@ -190,6 +172,10 @@
         choicesEl.appendChild(li);
       });
 
+      // Affiche la numérotation
+      questionCounter.textContent = `Question ${currentQuestion + 1} / ${questions.length}`;
+      updateProgressBar();
+
       timeLeft = 15;
       timeDisplay.textContent = timeLeft;
       clearInterval(timer);
@@ -211,7 +197,6 @@
       if (selected && selected.value === questions[currentQuestion].answer) {
         score++;
       }
-      // animation transition
       quizBox.style.opacity = 0;
       setTimeout(() => {
         currentQuestion++;
@@ -224,19 +209,40 @@
       }, 400);
     }
 
+    function updateProgressBar() {
+      const percent = ((currentQuestion) / questions.length) * 100;
+      const bar = document.getElementById('progress-bar');
+      bar.style.width = percent + "%";
+      if (percent < 30) {
+        bar.style.background = "#e74c3c"; // rouge
+      } else if (percent < 70) {
+        bar.style.background = "#f39c12"; // orange
+      } else {
+        bar.style.background = "#2ecc71"; // vert
+      }
+    }
+
     function showResult() {
       quizBox.classList.add('hidden');
       result.classList.remove('hidden');
       scoreText.textContent = `Ton score : ${score} / ${questions.length}`;
       message.textContent = score >= 7 ? "🏆 Bravo, tu es un vrai fan de foot !" : "⚽ Pas mal, tu feras mieux la prochaine fois !";
-      // sauvegarder score
       localStorage.setItem("dernierScore", score);
       const previous = localStorage.getItem("dernierScore");
       if (previous !== null) {
         previousScore.textContent = `Ton dernier score enregistré : ${previous} / ${questions.length}`;
       }
+      showStarRating(score);
+    }
+
+    function showStarRating(score) {
+      const total = questions.length;
+      const stars = Math.round((score / total) * 5);
+      let html = "🌟".repeat(stars) + "☆".repeat(5 - stars);
+      document.getElementById("starRating").innerHTML = html;
     }
   </script>
 
 </body>
 </html>
+
