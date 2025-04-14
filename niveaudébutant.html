@@ -18,6 +18,12 @@
       color: #2e7d32;
     }
 
+    #progression {
+      margin: 10px;
+      font-weight: bold;
+      color: #1b5e20;
+    }
+
     .question {
       margin: 20px auto;
       background: #ffffff;
@@ -28,7 +34,7 @@
       max-width: 600px;
     }
 
-    .choices button, .drop-zone, .vf-zone button {
+    .choices button {
       display: block;
       margin: 10px auto;
       padding: 10px 20px;
@@ -40,29 +46,8 @@
       transition: background 0.3s;
     }
 
-    .choices button:hover, .vf-zone button:hover {
+    .choices button:hover {
       background: #388e3c;
-    }
-
-    .drop-zone {
-      border: 2px dashed #4caf50;
-      background: #c8e6c9;
-      padding: 20px;
-      min-height: 40px;
-    }
-
-    .draggable {
-      background: #81c784;
-      padding: 5px 10px;
-      margin: 5px;
-      cursor: move;
-      display: inline-block;
-      border-radius: 5px;
-    }
-
-    .vf-zone {
-      display: flex;
-      justify-content: space-around;
     }
 
     #resultat-final {
@@ -73,10 +58,10 @@
 </head>
 <body>
   <h1>⚽ Quiz - Niveau Débutant</h1>
+  <div id="progression">Question 1 / 10</div>
 
   <div id="quiz-container" class="question">
     <div id="question-text"></div>
-    <div id="question-extra"></div>
     <div class="choices" id="choices"></div>
   </div>
 
@@ -87,29 +72,16 @@
 
   <script>
     const questions = [
-      {
-        type: "qcm",
-        question: "Quelle nation a remporté la Coupe du Monde 2018 ?",
-        choices: ["Brésil", "France", "Croatie", "Allemagne"],
-        answer: "France"
-      },
-      {
-        type: "vf",
-        question: "Le football se joue avec une balle carrée.",
-        answer: "faux"
-      },
-      {
-        type: "glisser",
-        question: "Glisse le bon mot dans la zone : Champion du monde 1998",
-        draggable: ["France", "Italie", "Allemagne"],
-        answer: "France"
-      },
-      {
-        type: "classement",
-        question: "Classe ces pays par nombre de Coupes du Monde remportées (du + au -)",
-        items: ["Brésil", "Allemagne", "France"],
-        answer: ["Brésil", "Allemagne", "France"]
-      }
+      { question: "Quelle nation a remporté la Coupe du Monde 2018 ?", choices: ["Brésil", "France", "Croatie", "Allemagne"], answer: "France" },
+      { question: "Combien de joueurs y a-t-il dans une équipe de football ?", choices: ["9", "10", "11", "12"], answer: "11" },
+      { question: "Quel est le surnom de l'équipe nationale du Brésil ?", choices: ["La Roja", "La Canarinha", "Les Bleus", "Les Lions"], answer: "La Canarinha" },
+      { question: "Quel joueur a marqué le but vainqueur lors de la finale 2010 ?", choices: ["Iniesta", "Messi", "Ronaldo", "Xavi"], answer: "Iniesta" },
+      { question: "Combien de minutes dure un match (temps réglementaire) ?", choices: ["80", "90", "100", "70"], answer: "90" },
+      { question: "Quel est le pays hôte de la Coupe du Monde 2022 ?", choices: ["Qatar", "USA", "Espagne", "Angleterre"], answer: "Qatar" },
+      { question: "Quel joueur a remporté le Ballon d'Or en 2019 ?", choices: ["Messi", "Modric", "Benzema", "Ronaldo"], answer: "Messi" },
+      { question: "Quel club a remporté la Ligue des Champions en 2019 ?", choices: ["Liverpool", "Tottenham", "Chelsea", "Real Madrid"], answer: "Liverpool" },
+      { question: "Quel est le nombre minimum de joueurs pour démarrer un match ?", choices: ["11", "10", "9", "7"], answer: "7" },
+      { question: "Quel joueur détient le record de buts en Coupe du Monde ?", choices: ["Miroslav Klose", "Pelé", "Ronaldo", "Messi"], answer: "Miroslav Klose" }
     ];
 
     let currentQuestion = 0;
@@ -118,88 +90,28 @@
     function showQuestion() {
       const q = questions[currentQuestion];
       document.getElementById("question-text").textContent = q.question;
+      document.getElementById("progression").textContent = `Question ${currentQuestion + 1} / ${questions.length}`;
       const choicesDiv = document.getElementById("choices");
-      const extraDiv = document.getElementById("question-extra");
       choicesDiv.innerHTML = "";
-      extraDiv.innerHTML = "";
-
-      if (q.type === "qcm") {
-        q.choices.forEach(choice => {
-          const btn = document.createElement("button");
-          btn.textContent = choice;
-          btn.onclick = () => checkAnswer(choice);
-          choicesDiv.appendChild(btn);
-        });
-      } else if (q.type === "vf") {
-        const vfZone = document.createElement("div");
-        vfZone.className = "vf-zone";
-        ["vrai", "faux"].forEach(rep => {
-          const btn = document.createElement("button");
-          btn.textContent = rep;
-          btn.onclick = () => checkAnswer(rep);
-          vfZone.appendChild(btn);
-        });
-        extraDiv.appendChild(vfZone);
-      } else if (q.type === "glisser") {
-        q.draggable.forEach(item => {
-          const drag = document.createElement("div");
-          drag.className = "draggable";
-          drag.draggable = true;
-          drag.textContent = item;
-          drag.ondragstart = e => e.dataTransfer.setData("text/plain", item);
-          extraDiv.appendChild(drag);
-        });
-        const dropZone = document.createElement("div");
-        dropZone.className = "drop-zone";
-        dropZone.ondragover = e => e.preventDefault();
-        dropZone.ondrop = e => {
-          e.preventDefault();
-          const data = e.dataTransfer.getData("text/plain");
-          checkAnswer(data);
-        };
-        choicesDiv.appendChild(dropZone);
-      } else if (q.type === "classement") {
-        const sortedItems = [...q.items];
-        sortedItems.forEach(item => {
-          const drag = document.createElement("div");
-          drag.className = "draggable";
-          drag.draggable = true;
-          drag.textContent = item;
-          drag.ondragstart = e => e.dataTransfer.setData("text/plain", item);
-          extraDiv.appendChild(drag);
-        });
-
-        const dropZone = document.createElement("div");
-        dropZone.className = "drop-zone";
-        dropZone.textContent = "Place les éléments ici dans le bon ordre.";
-        dropZone.ondragover = e => e.preventDefault();
-        let classement = [];
-        dropZone.ondrop = e => {
-          e.preventDefault();
-          const data = e.dataTransfer.getData("text/plain");
-          classement.push(data);
-          dropZone.textContent = classement.join(" > ");
-          if (classement.length === q.answer.length) {
-            checkAnswer(classement);
-          }
-        };
-        choicesDiv.appendChild(dropZone);
-      }
+      q.choices.forEach(choice => {
+        const btn = document.createElement("button");
+        btn.textContent = choice;
+        btn.onclick = () => handleAnswer(choice);
+        choicesDiv.appendChild(btn);
+      });
     }
 
-    function checkAnswer(choice) {
-      const q = questions[currentQuestion];
-      if (Array.isArray(choice)) {
-        if (JSON.stringify(choice) === JSON.stringify(q.answer)) score++;
-      } else {
-        if (choice.toLowerCase() === q.answer.toLowerCase()) score++;
-      }
+    function handleAnswer(choice) {
+      const isCorrect = choice === questions[currentQuestion].answer;
+      if (isCorrect) score++;
       currentQuestion++;
-      if (currentQuestion < questions.length) {
-        showQuestion();
-      } else {
-        finishQuiz();
-      }
+      setTimeout(() => {
+        if (currentQuestion < questions.length) {
+          showQuestion();
+        } else {
+          finishQuiz();
+        }
+      }, 500); // délai entre les questions (0.5 seconde)
     }
 
     function finishQuiz() {
@@ -224,4 +136,5 @@
   </script>
 </body>
 </html>
+
 
