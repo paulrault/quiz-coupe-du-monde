@@ -2,222 +2,253 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Quiz Coupe du Monde - XP & Combo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Foot - Accueil</title>
   <style>
-    * { box-sizing: border-box; }
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #f4f4f4;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
       margin: 0;
-    }
-    .container {
-      background: #fff;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      width: 90%;
-      max-width: 600px;
-      transition: opacity 0.5s ease-in-out;
-    }
-    h1, h2 {
+      padding: 0;
+      background: #f1f1f1;
       text-align: center;
-      color: #2e86de;
     }
-    p { font-size: 1em; margin: 10px 0; line-height: 1.6; }
-    button {
-      background-color: #2e86de;
+
+    h1 {
+      margin-top: 30px;
+      color: #2c3e50;
+    }
+
+    .pseudo-form {
+      margin: 30px auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #ffffff, #e3f2fd);
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 90%;
+      max-width: 500px;
+    }
+
+    .pseudo-form input {
+      padding: 12px 15px;
+      border-radius: 10px;
+      border: 2px solid #ddd;
+      font-size: 1em;
+      width: 60%;
+      transition: all 0.3s ease;
+    }
+
+    .pseudo-form input:focus {
+      border-color: #4CAF50;
+      outline: none;
+      box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+    }
+
+    .pseudo-form button {
+      margin-left: 10px;
+      padding: 12px 20px;
+      border-radius: 10px;
+      background-color: #4CAF50;
       color: white;
       border: none;
-      padding: 12px 20px;
-      border-radius: 8px;
       font-size: 1em;
       cursor: pointer;
-      margin-top: 20px;
-      display: block;
-      width: 100%;
+      transition: background 0.3s ease;
     }
-    button:hover { background-color: #1e5f9c; }
-    .hidden { display: none; }
-    .question { font-size: 1.2em; margin-bottom: 20px; }
-    .choices { list-style: none; padding: 0; }
-    .choices li { margin-bottom: 10px; }
-    #timer { font-size: 1.1em; text-align: right; color: #e74c3c; }
-    #progress-container {
-      width: 100%; height: 10px; background: #ddd; border-radius: 5px;
-      margin: 10px 0; overflow: hidden;
+
+    .pseudo-form button:hover {
+      background-color: #45a049;
     }
-    #progress-bar {
-      height: 100%; width: 0%; background: #2ecc71; transition: width 0.4s ease;
+
+    .best-xp-box {
+      margin: 20px auto;
+      padding: 15px 25px;
+      background: linear-gradient(to right, #ffe082, #ffca28);
+      color: #222;
+      font-weight: bold;
+      font-size: 1.2em;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      max-width: 400px;
+      text-align: center;
+      animation: none;
     }
-    #question-counter {
-      font-size: 1em; text-align: left; margin-bottom: 10px; color: #666;
+
+    .quiz-links {
+      margin: 30px auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
     }
-    #xpBar {
-      width: 100%; background: #ccc; height: 10px; border-radius: 5px; margin-top: 10px;
+
+    .quiz-link {
+      padding: 15px 20px;
+      background: #2196F3;
+      color: #fff;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: background 0.3s ease;
     }
-    #xpFill {
-      height: 100%; width: 0%; background: gold; transition: width 0.4s;
+
+    .quiz-link:hover {
+      background: #1976D2;
     }
-    #leaderboard ul { list-style: none; padding: 0; }
+
+    .activities {
+      margin: 30px auto;
+      padding: 20px;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      max-width: 500px;
+    }
+
+    .activities h2 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .activities ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .activities li {
+      padding: 8px 10px;
+      background: #f0f0f0;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+
+    #notification {
+      display: none;
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #4CAF50;
+      color: white;
+      padding: 15px 25px;
+      border-radius: 10px;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      z-index: 999;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    @keyframes flash {
+      0%, 100% { background-color: #ffeb3b; }
+      50% { background-color: #fff176; }
+    }
   </style>
 </head>
 <body>
-  <div class="container" id="pseudoScreen">
-    <h1>Bienvenue !</h1>
-    <p>Entre ton pseudo pour commencer le quiz :</p>
-    <input type="text" id="pseudoInput" placeholder="Ton pseudo" style="width:100%; padding:10px;">
-    <button onclick="startQuiz()">Commencer</button>
+  <h1>🏆 Bienvenue sur le Quiz Foot</h1>
+
+  <div class="pseudo-form">
+    <input type="text" id="input-pseudo" placeholder="🎮 Ton pseudo..." />
+    <button id="btn-submit-score">📤 Envoyer mes XP</button>
   </div>
 
-  <div class="container hidden" id="quizBox">
-    <div id="timer">Temps restant : <span id="time">15</span>s</div>
-    <div id="progress-container"><div id="progress-bar"></div></div>
-    <div id="question-counter"></div>
-    <div class="question" id="question"></div>
-    <ul class="choices" id="choices"></ul>
-    <div id="xpBar"><div id="xpFill"></div></div>
-    <p>XP : <span id="xpDisplay">0</span></p>
-    <button id="nextBtn">Suivant</button>
+  <div id="best-xp" class="best-xp-box">
+    🏆 Meilleur score : 0 XP
   </div>
 
-  <div class="container hidden" id="result">
-    <h2 id="scoreText">Score final : </h2>
-    <p id="levelMsg"></p>
-    <div id="leaderboard"></div>
-    <button onclick="location.reload()">Rejouer</button>
+  <div class="quiz-links">
+    <a href="niveau-debutant.html" class="quiz-link">⚽ Niveau Débutant</a>
+    <a href="niveau-intermediaire.html" class="quiz-link">🥅 Niveau Intermédiaire</a>
+    <a href="niveau-avance.html" class="quiz-link">🏟️ Niveau Avancé</a>
   </div>
+
+  <div class="activities">
+    <h2>📋 Activités réalisées</h2>
+    <ul id="activity-list"></ul>
+    <p id="activity-count"></p>
+  </div>
+
+  <div id="notification">✅ Score envoyé !</div>
+
+  <audio id="notif-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3"></audio>
+  <audio id="record-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-winning-swoosh-2018.mp3"></audio>
 
   <script>
-    const questions = [
-      { question: "Quel pays a remporté la Coupe du Monde 2018 ?", choices: ["Allemagne", "France", "Brésil", "Argentine"], answer: "France" },
-      { question: "Combien de joueurs sur le terrain ?", choices: ["9", "10", "11", "12"], answer: "11" },
-      { question: "Triplé en finale 2022 ?", choices: ["Messi", "Neymar", "Mbappé", "Ronaldo"], answer: "Mbappé" },
-      { question: "Pays organisateur en 1930 ?", choices: ["Italie", "Uruguay", "Brésil", "Allemagne"], answer: "Uruguay" },
-      { question: "Titres du Brésil ?", choices: ["3", "4", "5", "6"], answer: "5" },
-      { question: "Vainqueur 2014 ?", choices: ["Argentine", "Allemagne", "Espagne", "Pays-Bas"], answer: "Allemagne" },
-      { question: "Surnommé 'la Pulga' ?", choices: ["Neymar", "Ronaldo", "Messi", "Pelé"], answer: "Messi" },
-      { question: "Lieu Coupe du Monde 2022 ?", choices: ["Russie", "Qatar", "USA", "Espagne"], answer: "Qatar" },
-      { question: "Nom du trophée ?", choices: ["Ligue des Champions", "Ballon d’Or", "Jules Rimet", "UEFA"], answer: "Jules Rimet" },
-      { question: "Durée d’un match ?", choices: ["80", "90", "100", "60"], answer: "90" }
-    ];
+    const btnSubmit = document.getElementById("btn-submit-score");
 
-    let pseudo = "";
-    let currentQuestion = 0;
-    let score = 0;
-    let combo = 0;
-    let xp = 0;
-    let timer;
-    let timeLeft = 15;
-
-    const pseudoScreen = document.getElementById('pseudoScreen');
-    const quizBox = document.getElementById('quizBox');
-    const result = document.getElementById('result');
-    const questionEl = document.getElementById('question');
-    const choicesEl = document.getElementById('choices');
-    const xpFill = document.getElementById('xpFill');
-    const xpDisplay = document.getElementById('xpDisplay');
-
-    function startQuiz() {
-      pseudo = document.getElementById('pseudoInput').value.trim();
-      if (!pseudo) return alert("Entre ton pseudo !");
-      pseudoScreen.classList.add('hidden');
-      quizBox.classList.remove('hidden');
-      loadQuestion();
+    function envoyerScore(pseudo, totalXP) {
+      console.log(`Envoyé à Firebase : ${pseudo} avec ${totalXP} XP`);
     }
 
-    function loadQuestion() {
-      const q = questions[currentQuestion];
-      questionEl.textContent = q.question;
-      choicesEl.innerHTML = "";
-      q.choices.forEach(c => {
+    function afficherNotification(message, type = "success") {
+      const notif = document.getElementById("notification");
+      const sound = document.getElementById("notif-sound");
+      let icon = type === "error" ? "❌" : "✅";
+      notif.innerHTML = `<span style="margin-right: 10px;">${icon}</span> ${message}`;
+      notif.style.backgroundColor = type === "error" ? "#e53935" : "#4CAF50";
+      notif.style.display = "block";
+      notif.style.opacity = "1";
+      sound.currentTime = 0;
+      sound.play();
+
+      setTimeout(() => {
+        notif.style.opacity = "0";
+        setTimeout(() => notif.style.display = "none", 300);
+      }, 2500);
+    }
+
+    function afficherMeilleurXP() {
+      const bestXP = parseInt(localStorage.getItem("bestXP")) || 0;
+      document.getElementById("best-xp").textContent = `🏆 Meilleur score : ${bestXP} XP`;
+    }
+
+    function afficherActivites() {
+      const activityList = document.getElementById("activity-list");
+      const activityCount = document.getElementById("activity-count");
+      const completed = JSON.parse(localStorage.getItem("activities")) || [];
+
+      activityList.innerHTML = "";
+      completed.forEach(name => {
         const li = document.createElement("li");
-        li.innerHTML = `<label><input type='radio' name='choice' value="${c}"> ${c}</label>`;
-        choicesEl.appendChild(li);
+        li.textContent = name;
+        activityList.appendChild(li);
       });
-      document.getElementById('question-counter').textContent = `Question ${currentQuestion + 1} / ${questions.length}`;
-      updateProgressBar();
-      timeLeft = 15;
-      document.getElementById("time").textContent = timeLeft;
-      clearInterval(timer);
-      timer = setInterval(() => {
-        timeLeft--;
-        document.getElementById("time").textContent = timeLeft;
-        if (timeLeft === 0) {
-          clearInterval(timer);
-          nextQuestion();
-        }
-      }, 1000);
+
+      activityCount.textContent = `Activités complétées : ${completed.length} / 3`;
     }
 
-    document.getElementById("nextBtn").addEventListener("click", nextQuestion);
+    btnSubmit.addEventListener("click", () => {
+      const pseudo = document.getElementById("input-pseudo").value.trim();
+      const totalXP = parseInt(localStorage.getItem("totalXP")) || 0;
 
-    function nextQuestion() {
-      clearInterval(timer);
-      const selected = document.querySelector("input[name='choice']:checked");
-      const correct = selected && selected.value === questions[currentQuestion].answer;
-      if (correct) {
-        combo++;
-        xp += (combo >= 4) ? 2 : 1;
-        score++;
-      } else {
-        combo = 0;
+      if (!pseudo) {
+        afficherNotification("⚠️ Pseudo manquant", "error");
+        return;
       }
-      xpDisplay.textContent = xp;
-      xpFill.style.width = (xp / (questions.length * 2)) * 100 + "%";
 
-      currentQuestion++;
-      if (currentQuestion < questions.length) {
-        quizBox.style.opacity = 0;
-        setTimeout(() => {
-          quizBox.style.opacity = 1;
-          loadQuestion();
-        }, 300);
-      } else {
-        showResult();
+      if (totalXP === 0) {
+        afficherNotification("⚠️ Aucun XP à envoyer", "error");
+        return;
       }
-    }
 
-    function updateProgressBar() {
-      const percent = (currentQuestion / questions.length) * 100;
-      const bar = document.getElementById('progress-bar');
-      bar.style.width = percent + "%";
-      if (percent < 30) bar.style.background = "#e74c3c";
-      else if (percent < 70) bar.style.background = "#f39c12";
-      else bar.style.background = "#2ecc71";
-    }
+      const bestXP = parseInt(localStorage.getItem("bestXP")) || 0;
+      envoyerScore(pseudo, totalXP);
 
-    function showResult() {
-      quizBox.classList.add('hidden');
-      result.classList.remove('hidden');
-      document.getElementById('scoreText').textContent = `${pseudo}, tu as obtenu ${score}/10`;
-      document.getElementById('levelMsg').textContent = score === 10 ? "✅ Niveau suivant débloqué !" : "🔒 Fais un 10/10 pour débloquer le prochain niveau.";
-      saveToLeaderboard(pseudo, xp);
-      showLeaderboard();
-    }
+      if (totalXP > bestXP) {
+        localStorage.setItem("bestXP", totalXP);
+        afficherNotification("🎉 Nouveau record !");
+      } else {
+        afficherNotification("✅ Score envoyé !");
+      }
 
-    function saveToLeaderboard(pseudo, xp) {
-      const data = JSON.parse(localStorage.getItem("leaderboard") || "[]");
-      data.push({ pseudo, xp });
-      data.sort((a, b) => b.xp - a.xp);
-      localStorage.setItem("leaderboard", JSON.stringify(data.slice(0, 5)));
-    }
+      afficherMeilleurXP();
+    });
 
-    function showLeaderboard() {
-      const data = JSON.parse(localStorage.getItem("leaderboard") || "[]");
-      const html = `
-        <h3>🏆 Classement</h3>
-        <ul>
-          ${data.map(p => `<li>${p.pseudo} - ${p.xp} XP</li>`).join('')}
-        </ul>
-      `;
-      document.getElementById("leaderboard").innerHTML = html;
-    }
+    afficherMeilleurXP();
+    afficherActivites();
   </script>
 </body>
 </html>
+
 
 
