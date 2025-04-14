@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Quiz Coupe du Monde</title>
+  <title>Quiz Coupe du Monde - XP & Combo</title>
   <style>
     * { box-sizing: border-box; }
     body {
@@ -27,11 +27,7 @@
       text-align: center;
       color: #2e86de;
     }
-    p {
-      font-size: 1em;
-      margin: 10px 0;
-      line-height: 1.6;
-    }
+    p { font-size: 1em; margin: 10px 0; line-height: 1.6; }
     button {
       background-color: #2e86de;
       color: white;
@@ -44,63 +40,37 @@
       display: block;
       width: 100%;
     }
-    button:hover {
-      background-color: #1e5f9c;
-    }
-    .hidden {
-      display: none;
-    }
-    .question {
-      font-size: 1.2em;
-      margin-bottom: 20px;
-    }
-    .choices {
-      list-style: none;
-      padding: 0;
-    }
-    .choices li {
-      margin-bottom: 10px;
-    }
-    #timer {
-      font-size: 1.1em;
-      text-align: right;
-      color: #e74c3c;
-    }
+    button:hover { background-color: #1e5f9c; }
+    .hidden { display: none; }
+    .question { font-size: 1.2em; margin-bottom: 20px; }
+    .choices { list-style: none; padding: 0; }
+    .choices li { margin-bottom: 10px; }
+    #timer { font-size: 1.1em; text-align: right; color: #e74c3c; }
     #progress-container {
-      width: 100%;
-      height: 10px;
-      background: #ddd;
-      border-radius: 5px;
-      margin: 10px 0;
-      overflow: hidden;
+      width: 100%; height: 10px; background: #ddd; border-radius: 5px;
+      margin: 10px 0; overflow: hidden;
     }
     #progress-bar {
-      height: 100%;
-      width: 0%;
-      background: #2ecc71;
-      transition: width 0.4s ease;
+      height: 100%; width: 0%; background: #2ecc71; transition: width 0.4s ease;
     }
     #question-counter {
-      font-size: 1em;
-      text-align: left;
-      margin-bottom: 10px;
-      color: #666;
+      font-size: 1em; text-align: left; margin-bottom: 10px; color: #666;
     }
+    #xpBar {
+      width: 100%; background: #ccc; height: 10px; border-radius: 5px; margin-top: 10px;
+    }
+    #xpFill {
+      height: 100%; width: 0%; background: gold; transition: width 0.4s;
+    }
+    #leaderboard ul { list-style: none; padding: 0; }
   </style>
 </head>
 <body>
-
-  <div class="container" id="intro">
-    <h1>Avant de commencer...</h1>
-    <p>Bienvenue dans ce quiz sur la Coupe du Monde de Football 🌍⚽</p>
-    <p>Petit rappel :</p>
-    <ul>
-      <li>La première Coupe du Monde a eu lieu en 1930</li>
-      <li>Le Brésil est l’équipe la plus titrée avec 5 victoires</li>
-      <li>Le dernier vainqueur est l’Argentine (2022)</li>
-      <li>Tu auras 15 secondes par question ⏱</li>
-    </ul>
-    <button onclick="startQuiz()">Commencer le quiz</button>
+  <div class="container" id="pseudoScreen">
+    <h1>Bienvenue !</h1>
+    <p>Entre ton pseudo pour commencer le quiz :</p>
+    <input type="text" id="pseudoInput" placeholder="Ton pseudo" style="width:100%; padding:10px;">
+    <button onclick="startQuiz()">Commencer</button>
   </div>
 
   <div class="container hidden" id="quizBox">
@@ -109,50 +79,52 @@
     <div id="question-counter"></div>
     <div class="question" id="question"></div>
     <ul class="choices" id="choices"></ul>
+    <div id="xpBar"><div id="xpFill"></div></div>
+    <p>XP : <span id="xpDisplay">0</span></p>
     <button id="nextBtn">Suivant</button>
   </div>
 
   <div class="container hidden" id="result">
     <h2 id="scoreText">Score final : </h2>
-    <div id="starRating" style="text-align: center; font-size: 1.5em; margin-top: 10px;"></div>
-    <p id="message"></p>
-    <p id="previousScore"></p>
+    <p id="levelMsg"></p>
+    <div id="leaderboard"></div>
     <button onclick="location.reload()">Rejouer</button>
   </div>
 
   <script>
     const questions = [
       { question: "Quel pays a remporté la Coupe du Monde 2018 ?", choices: ["Allemagne", "France", "Brésil", "Argentine"], answer: "France" },
-      { question: "Combien de joueurs composent une équipe sur le terrain ?", choices: ["9", "10", "11", "12"], answer: "11" },
-      { question: "Quel joueur a marqué un triplé en finale de la Coupe du Monde 2022 ?", choices: ["Lionel Messi", "Neymar", "Kylian Mbappé", "Cristiano Ronaldo"], answer: "Kylian Mbappé" },
-      { question: "Quel pays a organisé la première Coupe du Monde en 1930 ?", choices: ["Italie", "Uruguay", "Brésil", "Allemagne"], answer: "Uruguay" },
-      { question: "Combien de Coupes du Monde a remportées le Brésil ?", choices: ["3", "4", "5", "6"], answer: "5" },
-      { question: "Quel pays a gagné la Coupe du Monde 2014 ?", choices: ["Argentine", "Allemagne", "Espagne", "Pays-Bas"], answer: "Allemagne" },
-      { question: "Qui est surnommé 'la Pulga' ?", choices: ["Neymar", "Cristiano Ronaldo", "Lionel Messi", "Pelé"], answer: "Lionel Messi" },
-      { question: "Dans quel pays s’est déroulée la Coupe du Monde 2022 ?", choices: ["Russie", "Qatar", "États-Unis", "Espagne"], answer: "Qatar" },
-      { question: "Quel trophée remporte le vainqueur de la Coupe du Monde ?", choices: ["Ligue des Champions", "Ballon d’Or", "Trophée Jules Rimet", "Trophée UEFA"], answer: "Trophée Jules Rimet" },
-      { question: "Combien de temps dure un match de football (hors prolongation) ?", choices: ["80 minutes", "90 minutes", "100 minutes", "60 minutes"], answer: "90 minutes" }
+      { question: "Combien de joueurs sur le terrain ?", choices: ["9", "10", "11", "12"], answer: "11" },
+      { question: "Triplé en finale 2022 ?", choices: ["Messi", "Neymar", "Mbappé", "Ronaldo"], answer: "Mbappé" },
+      { question: "Pays organisateur en 1930 ?", choices: ["Italie", "Uruguay", "Brésil", "Allemagne"], answer: "Uruguay" },
+      { question: "Titres du Brésil ?", choices: ["3", "4", "5", "6"], answer: "5" },
+      { question: "Vainqueur 2014 ?", choices: ["Argentine", "Allemagne", "Espagne", "Pays-Bas"], answer: "Allemagne" },
+      { question: "Surnommé 'la Pulga' ?", choices: ["Neymar", "Ronaldo", "Messi", "Pelé"], answer: "Messi" },
+      { question: "Lieu Coupe du Monde 2022 ?", choices: ["Russie", "Qatar", "USA", "Espagne"], answer: "Qatar" },
+      { question: "Nom du trophée ?", choices: ["Ligue des Champions", "Ballon d’Or", "Jules Rimet", "UEFA"], answer: "Jules Rimet" },
+      { question: "Durée d’un match ?", choices: ["80", "90", "100", "60"], answer: "90" }
     ];
 
+    let pseudo = "";
     let currentQuestion = 0;
     let score = 0;
+    let combo = 0;
+    let xp = 0;
     let timer;
     let timeLeft = 15;
 
+    const pseudoScreen = document.getElementById('pseudoScreen');
+    const quizBox = document.getElementById('quizBox');
+    const result = document.getElementById('result');
     const questionEl = document.getElementById('question');
     const choicesEl = document.getElementById('choices');
-    const nextBtn = document.getElementById('nextBtn');
-    const quizBox = document.getElementById('quizBox');
-    const intro = document.getElementById('intro');
-    const result = document.getElementById('result');
-    const scoreText = document.getElementById('scoreText');
-    const message = document.getElementById('message');
-    const previousScore = document.getElementById('previousScore');
-    const timeDisplay = document.getElementById('time');
-    const questionCounter = document.getElementById('question-counter');
+    const xpFill = document.getElementById('xpFill');
+    const xpDisplay = document.getElementById('xpDisplay');
 
     function startQuiz() {
-      intro.classList.add('hidden');
+      pseudo = document.getElementById('pseudoInput').value.trim();
+      if (!pseudo) return alert("Entre ton pseudo !");
+      pseudoScreen.classList.add('hidden');
       quizBox.classList.remove('hidden');
       loadQuestion();
     }
@@ -161,27 +133,19 @@
       const q = questions[currentQuestion];
       questionEl.textContent = q.question;
       choicesEl.innerHTML = "";
-      q.choices.forEach(choice => {
+      q.choices.forEach(c => {
         const li = document.createElement("li");
-        const radio = document.createElement("input");
-        radio.type = "radio";
-        radio.name = "choice";
-        radio.value = choice;
-        li.appendChild(radio);
-        li.appendChild(document.createTextNode(" " + choice));
+        li.innerHTML = `<label><input type='radio' name='choice' value="${c}"> ${c}</label>`;
         choicesEl.appendChild(li);
       });
-
-      // Affiche la numérotation
-      questionCounter.textContent = `Question ${currentQuestion + 1} / ${questions.length}`;
+      document.getElementById('question-counter').textContent = `Question ${currentQuestion + 1} / ${questions.length}`;
       updateProgressBar();
-
       timeLeft = 15;
-      timeDisplay.textContent = timeLeft;
+      document.getElementById("time").textContent = timeLeft;
       clearInterval(timer);
       timer = setInterval(() => {
         timeLeft--;
-        timeDisplay.textContent = timeLeft;
+        document.getElementById("time").textContent = timeLeft;
         if (timeLeft === 0) {
           clearInterval(timer);
           nextQuestion();
@@ -189,60 +153,71 @@
       }, 1000);
     }
 
-    nextBtn.addEventListener("click", nextQuestion);
+    document.getElementById("nextBtn").addEventListener("click", nextQuestion);
 
     function nextQuestion() {
       clearInterval(timer);
-      const selected = document.querySelector('input[name="choice"]:checked');
-      if (selected && selected.value === questions[currentQuestion].answer) {
+      const selected = document.querySelector("input[name='choice']:checked");
+      const correct = selected && selected.value === questions[currentQuestion].answer;
+      if (correct) {
+        combo++;
+        xp += (combo >= 4) ? 2 : 1;
         score++;
+      } else {
+        combo = 0;
       }
-      quizBox.style.opacity = 0;
-      setTimeout(() => {
-        currentQuestion++;
-        if (currentQuestion < questions.length) {
-          loadQuestion();
+      xpDisplay.textContent = xp;
+      xpFill.style.width = (xp / (questions.length * 2)) * 100 + "%";
+
+      currentQuestion++;
+      if (currentQuestion < questions.length) {
+        quizBox.style.opacity = 0;
+        setTimeout(() => {
           quizBox.style.opacity = 1;
-        } else {
-          showResult();
-        }
-      }, 400);
+          loadQuestion();
+        }, 300);
+      } else {
+        showResult();
+      }
     }
 
     function updateProgressBar() {
-      const percent = ((currentQuestion) / questions.length) * 100;
+      const percent = (currentQuestion / questions.length) * 100;
       const bar = document.getElementById('progress-bar');
       bar.style.width = percent + "%";
-      if (percent < 30) {
-        bar.style.background = "#e74c3c"; // rouge
-      } else if (percent < 70) {
-        bar.style.background = "#f39c12"; // orange
-      } else {
-        bar.style.background = "#2ecc71"; // vert
-      }
+      if (percent < 30) bar.style.background = "#e74c3c";
+      else if (percent < 70) bar.style.background = "#f39c12";
+      else bar.style.background = "#2ecc71";
     }
 
     function showResult() {
       quizBox.classList.add('hidden');
       result.classList.remove('hidden');
-      scoreText.textContent = `Ton score : ${score} / ${questions.length}`;
-      message.textContent = score >= 7 ? "🏆 Bravo, tu es un vrai fan de foot !" : "⚽ Pas mal, tu feras mieux la prochaine fois !";
-      localStorage.setItem("dernierScore", score);
-      const previous = localStorage.getItem("dernierScore");
-      if (previous !== null) {
-        previousScore.textContent = `Ton dernier score enregistré : ${previous} / ${questions.length}`;
-      }
-      showStarRating(score);
+      document.getElementById('scoreText').textContent = `${pseudo}, tu as obtenu ${score}/10`;
+      document.getElementById('levelMsg').textContent = score === 10 ? "✅ Niveau suivant débloqué !" : "🔒 Fais un 10/10 pour débloquer le prochain niveau.";
+      saveToLeaderboard(pseudo, xp);
+      showLeaderboard();
     }
 
-    function showStarRating(score) {
-      const total = questions.length;
-      const stars = Math.round((score / total) * 5);
-      let html = "🌟".repeat(stars) + "☆".repeat(5 - stars);
-      document.getElementById("starRating").innerHTML = html;
+    function saveToLeaderboard(pseudo, xp) {
+      const data = JSON.parse(localStorage.getItem("leaderboard") || "[]");
+      data.push({ pseudo, xp });
+      data.sort((a, b) => b.xp - a.xp);
+      localStorage.setItem("leaderboard", JSON.stringify(data.slice(0, 5)));
+    }
+
+    function showLeaderboard() {
+      const data = JSON.parse(localStorage.getItem("leaderboard") || "[]");
+      const html = `
+        <h3>🏆 Classement</h3>
+        <ul>
+          ${data.map(p => `<li>${p.pseudo} - ${p.xp} XP</li>`).join('')}
+        </ul>
+      `;
+      document.getElementById("leaderboard").innerHTML = html;
     }
   </script>
-
 </body>
 </html>
+
 
