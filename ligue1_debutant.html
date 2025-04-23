@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Ligue 1 - Débutant</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f3f4f6;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    .container {
+      padding: 2rem;
+    }
+    h1 {
+      color: #1e3a8a;
+    }
+    .question-box {
+      background: white;
+      border-radius: 8px;
+      padding: 1.5rem;
+      max-width: 600px;
+      margin: 2rem auto;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    button {
+      background-color: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      margin: 0.5rem;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #2563eb;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Quiz Ligue 1 - Niveau Débutant</h1>
+    <div id="quiz" class="question-box">
+      <!-- Les questions s'afficheront ici -->
+    </div>
+    <div id="resultat" class="question-box" style="display:none">
+      <h2>Résultat</h2>
+      <p id="score"></p>
+      <button onclick="recommencer()">Recommencer</button>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        question: "Quel club a remporté la Ligue 1 en 2023 ?",
+        choices: ["Marseille", "Lyon", "Paris SG", "Monaco"],
+        answer: "Paris SG"
+      },
+      {
+        question: "Combien de clubs participent à la Ligue 1 ?",
+        choices: ["18", "20", "22", "16"],
+        answer: "18"
+      },
+      {
+        question: "Quel joueur est le meilleur buteur de l'histoire de la Ligue 1 ?",
+        choices: ["Mbappé", "Cavani", "Delio Onnis", "Pauleta"],
+        answer: "Delio Onnis"
+      }
+    ];
+
+    let current = 0;
+    let correct = 0;
+
+    function showQuestion() {
+      if (current >= questions.length) return showResult();
+      const q = questions[current];
+      const quiz = document.getElementById("quiz");
+      quiz.innerHTML = `<h2>${q.question}</h2>` +
+        q.choices.map(c => `<button onclick=\"check('${c}')\">${c}</button>`).join('');
+    }
+
+    function check(choice) {
+      const q = questions[current];
+      if (choice === q.answer) correct++;
+      current++;
+      showQuestion();
+    }
+
+    function showResult() {
+      document.getElementById("quiz").style.display = 'none';
+      document.getElementById("resultat").style.display = 'block';
+      document.getElementById("score").textContent = `Tu as obtenu ${correct} / ${questions.length}`;
+    }
+
+    function recommencer() {
+      current = 0;
+      correct = 0;
+      document.getElementById("quiz").style.display = 'block';
+      document.getElementById("resultat").style.display = 'none';
+      showQuestion();
+    }
+
+    showQuestion();
+  </script>
+</body>
+</html>
